@@ -145,12 +145,14 @@ const ensureProductsFileExists = async() => {
 
 export const parseCSVFile = async(filePath) =>  {
     const products = [];
+    let idCounter = 0;
 
     return new Promise((resolve, reject) => {
         createReadStream(filePath)
             .pipe(csv())
             .on('data', (row) => {
                 const product = {
+                    id: idCounter++,
                     name: row.name,
                     description: row.description,
                     category: row.category,
