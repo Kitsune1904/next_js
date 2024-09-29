@@ -68,6 +68,3 @@ export const getProduct = (req, res) => {
     return product
 }
 
-export const getDate = () => {
-    return new Date().toISOString().replace('T', ' ').split('.')[0]
-}

@@ -1,4 +1,4 @@
-import {addProductInStorage, getDate, getProduct, getProductStorage} from "../helpers/helpers.js";
+import {addProductInStorage, getProduct} from "../helpers/helpers.js";
 import {carts, orders, products, users} from "../storages/storage.js";
 import crypto from "crypto";
 import bcrypt from "bcrypt";
@@ -7,16 +7,31 @@ import { userValidationSchema} from "../helpers/validation.js";
 import { EventEmitter } from 'events';
 import fs, { unlink } from 'fs/promises';
 import * as path from "path";
-import {createReadStream} from "fs";
+import {createReadStream, appendFileSync} from "fs";
 import csv from "csv-parser";
 
 const PRODUCTS_FILE = path.join('storages', 'products.store.json');
+const LOG_FILE = path.join('storages', 'filesUpload.log');
 
 
 const uploadEvents = new EventEmitter();
-uploadEvents.on('fileUploadStart', (message) => console.log(message));
+
+async function logEvent(message) {
+    const timestamp = new Date().toISOString().replace('T', ' ').split('.')[0];
+    const logMessage = `${timestamp} - ${message}\n`;
+    await fs.appendFile(LOG_FILE, logMessage, (err) => {
+        if(err) {
+            console.error('Error appending data to file:', err);
+        }
+    });
+}
+/*uploadEvents.on('fileUploadStart', (message) => console.log(message));
 uploadEvents.on('fileUploadEnd', (message) => console.log(message));
-uploadEvents.on('fileUploadFailed', (error) => console.error(error));
+uploadEvents.on('fileUploadFailed', (error) => console.error(error));*/
+
+uploadEvents.on('fileUploadStart', async () => await logEvent('File upload has started'));
+uploadEvents.on('fileUploadEnd', async () => await logEvent('File has been uploaded'));
+uploadEvents.on('fileUploadFailed', async (error) => await logEvent(`Error occurred, file upload failed: ${error}`));
 
 export const registrationUser = async (req, res) => {
     const newUser = req.body
@@ -118,17 +133,17 @@ export const createNewProduct = async (req, res) => {
 export const handleProductImport = async (req, res) =>  {
     const filePath = 'storages/products.csv';
 
-    uploadEvents.emit('fileUploadStart', getDate() + ' - File upload has started');
+    uploadEvents.emit('fileUploadStart');
 
     try {
         const products = await parseCSVFile(filePath);
         await saveProducts(products);
         await unlink(filePath);
 
-        uploadEvents.emit('fileUploadEnd', getDate() + ' - File has been uploaded');
+        uploadEvents.emit('fileUploadEnd');
         res.status(200).json({ message: 'File successfully uploaded and processed' });
     } catch (error) {
-        uploadEvents.emit('fileUploadFailed', getDate() + ' - Error occurred, file upload was failed: ' + error.message);
+        uploadEvents.emit('fileUploadFailed');
         await unlink(filePath);
         throw new ApiError(500, 'Failed to process file')
     }
