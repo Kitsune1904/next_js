@@ -143,7 +143,7 @@ const ensureProductsFileExists = async() => {
     }
 }
 
-export const parseCSVFile = async(filePath) =>  {
+const parseCSVFile = async(filePath) =>  {
     const products = [];
     let idCounter = 0;
 
@@ -165,7 +165,7 @@ export const parseCSVFile = async(filePath) =>  {
     });
 }
 
-export const saveProducts = async(newProducts) => {
+const saveProducts = async(newProducts) => {
     await ensureProductsFileExists();
 
     try {

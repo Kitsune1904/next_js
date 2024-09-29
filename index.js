@@ -4,7 +4,7 @@ import cartRouter from "./helpers/routes/cartRoutes.js";
 import {registrationUser} from "./shop/services.js";
 import {errorHandler} from "./helpers/helpers.js";
 
-const PORT = 6000;
+const PORT = 5000;
 
 const app = express();
 app.use(express.json());

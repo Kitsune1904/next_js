@@ -28,7 +28,10 @@ export const addProductInStorage = async (appendData) => {
         }
     }
 
-    productsStore.push(appendData);
+    productsStore.push({
+        id: productsStore.length,
+        ...appendData
+    });
 
     try {
         await fs.writeFile('storages/products.store.json', JSON.stringify(productsStore), 'utf8')
