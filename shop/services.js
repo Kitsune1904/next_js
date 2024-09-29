@@ -9,9 +9,9 @@ import fs, { unlink } from 'fs/promises';
 import * as path from "path";
 import {createReadStream, appendFileSync} from "fs";
 import csv from "csv-parser";
+import {LOG_FILE, PRODUCTS_FILE} from "../helpers/constants.js";
 
-const PRODUCTS_FILE = path.join('storages', 'products.store.json');
-const LOG_FILE = path.join('storages', 'filesUpload.log');
+
 
 
 const uploadEvents = new EventEmitter();
@@ -25,9 +25,6 @@ async function logEvent(message) {
         }
     });
 }
-/*uploadEvents.on('fileUploadStart', (message) => console.log(message));
-uploadEvents.on('fileUploadEnd', (message) => console.log(message));
-uploadEvents.on('fileUploadFailed', (error) => console.error(error));*/
 
 uploadEvents.on('fileUploadStart', async () => await logEvent('File upload has started'));
 uploadEvents.on('fileUploadEnd', async () => await logEvent('File has been uploaded'));
@@ -37,7 +34,7 @@ export const registrationUser = async (req, res) => {
     const newUser = req.body
 
     await userValidationSchema.validateAsync(newUser).catch(error => {
-        throw new ApiError(!newUser.name || !newUser.email || !newUser.password ? 402 : 400, error.details[0].message);
+        throw new ApiError(400, error.details[0].message);
     });
 
     const isUserExist = users.some(user => user.email === newUser.email)
@@ -82,7 +79,7 @@ export const createOrSetCart = (req, res) => {
     res.status(201).json(userCart);
 }
 
-export const deleteProd = (req, res) => {
+export const deleteProduct = (req, res) => {
     const prodId = Number(req.params.id);
     const userId = req.userId;
     let userCart = carts.find(cart => cart.userId === userId);
@@ -160,14 +157,13 @@ const ensureProductsFileExists = async() => {
 
 const parseCSVFile = async(filePath) =>  {
     const products = [];
-    let idCounter = 0;
 
     return new Promise((resolve, reject) => {
         createReadStream(filePath)
             .pipe(csv())
             .on('data', (row) => {
                 const product = {
-                    id: idCounter++,
+                    id: crypto.randomUUID(),
                     name: row.name,
                     description: row.description,
                     category: row.category,

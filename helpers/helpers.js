@@ -2,10 +2,12 @@ import {products} from "../storages/storage.js";
 import {ApiError} from "./ErrorApi.js";
 import * as path from "path";
 import fs from 'fs/promises';
+import crypto from "crypto";
+import {PRODUCTS_FILE} from "./constants.js";
 
 export const getProductStorage =  async () => {
     try {
-        const data = await fs.readFile('storages/products.store.json', 'utf-8');
+        const data = await fs.readFile(PRODUCTS_FILE, 'utf-8');
         return JSON.parse(data);
     } catch (err) {
         if (err.code === 'ENOENT') {
@@ -29,12 +31,12 @@ export const addProductInStorage = async (appendData) => {
     }
 
     productsStore.push({
-        id: productsStore.length,
+        id: crypto.randomUUID(),
         ...appendData
     });
 
     try {
-        await fs.writeFile('storages/products.store.json', JSON.stringify(productsStore), 'utf8')
+        await fs.writeFile(PRODUCTS_FILE, JSON.stringify(productsStore), 'utf8')
     } catch (err) {
         throw new ApiError(500, 'Error adding data');
     }

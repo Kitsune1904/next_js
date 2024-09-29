@@ -3,8 +3,8 @@ import prodRouter from "./helpers/routes/prodRoutes.js";
 import cartRouter from "./helpers/routes/cartRoutes.js";
 import {registrationUser} from "./shop/services.js";
 import {errorHandler} from "./helpers/helpers.js";
+import {PORT} from "./helpers/constants.js";
 
-const PORT = 5000;
 
 const app = express();
 app.use(express.json());
