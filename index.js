@@ -1,15 +1,15 @@
 import express from 'express';
-import prodRouter from "./helpers/routes/prodRoutes.js";
-import cartRouter from "./helpers/routes/cartRoutes.js";
-import {registrationUser} from "./shop/services.js";
-import {errorHandler} from "./helpers/helpers.js";
-import {PORT} from "./helpers/constants.js";
+import prodRouter from "./routes/prodRoutes.js";
+import cartRouter from "./routes/cartRoutes.js";
+import {PORT} from "./constants.js";
+import {signUp} from "./controllers/user.controllers.js";
+import {errorHandler} from "./middleware/errorHandler.js";
 
 
 const app = express();
 app.use(express.json());
 
-app.post('/api/register', registrationUser)
+app.post('/api/register', signUp)
 
 app.use('/api/products', prodRouter);
 

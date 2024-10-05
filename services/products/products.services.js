@@ -1,10 +1,25 @@
-import {products} from "../storages/storage.js";
-import {ApiError} from "./ErrorApi.js";
-import fs from 'fs/promises';
+import {ApiError} from "../../middleware/ErrorApi.js";
+import fs from "fs/promises";
+import {PRODUCTS_FILE} from "../../constants.js";
 import crypto from "crypto";
-import {PRODUCTS_FILE} from "./constants.js";
+import {products} from "../../repository/storage.js";
 
-export const getProductStorage =  async () => {
+/**
+ * Creates new product
+ * @param body
+ * @return {{name, description, category, price}}
+ */
+export const createNewProduct = (body) => {
+    const { name, description, category, price } = body;
+
+    if(!name || !description || !category || !price ) {
+        throw new ApiError(400, 'Missing required fields')
+    }
+    return {name, description, category, price}
+}
+
+
+export const getProductsStorage =  async () => {
     try {
         const data = await fs.readFile(PRODUCTS_FILE, 'utf-8');
         return JSON.parse(data);
@@ -19,11 +34,12 @@ export const getProductStorage =  async () => {
     }
 };
 
-export const addProductInStorage = async (appendData) => {
-    const productsStore = await getProductStorage();
+export const addProductInStorage = async (body) => {
+    const product = createNewProduct(body)
+    const productsStore = await getProductsStorage();
 
     if (productsStore.length > 0) {
-        const isProdExist = productsStore.findIndex(prod => prod.name === appendData.name);
+        const isProdExist = productsStore.findIndex(prod => prod.name === product.name);
         if (isProdExist !== -1) {
             throw new ApiError(409, 'Product exist')
         }
@@ -31,7 +47,7 @@ export const addProductInStorage = async (appendData) => {
 
     productsStore.push({
         id: crypto.randomUUID(),
-        ...appendData
+        ...product
     });
 
     try {
@@ -39,25 +55,10 @@ export const addProductInStorage = async (appendData) => {
     } catch (err) {
         throw new ApiError(500, 'Error adding data');
     }
+    return product
 }
 
-
-export const errorHandler = (err, req, res) => {
-    res.status(err.statusCode || 500).json({
-        message: err.message || 'Internal Server Error'
-    });
-}
-
-export const checkUserId = (req, res, next) => {
-    const userId = req.headers['x-user-id'];
-    if (!userId) {
-        throw new ApiError(401, 'Unauthorized')
-    }
-    req.userId = userId;
-    next();
-}
-
-export const getProduct = (req, res) => {
+export const getProduct = (req, _) => {
     const productId = Number(req.params.id);
     if (isNaN(productId)) {
         throw new ApiError(400, 'Wrong id format')
@@ -68,4 +69,3 @@ export const getProduct = (req, res) => {
     }
     return product
 }
-
