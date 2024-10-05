@@ -35,7 +35,7 @@ export const addProductInStorage = async (appendData) => {
     });
 
     try {
-        await fs.writeFile(PRODUCTS_FILE, JSON.stringify(productsStore), 'utf8')
+        await fs.writeFile(PRODUCTS_FILE, JSON.stringify(productsStore, null, 2), 'utf8')
     } catch (err) {
         throw new ApiError(500, 'Error adding data');
     }

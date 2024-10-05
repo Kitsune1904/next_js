@@ -6,18 +6,11 @@ import {ApiError} from "../helpers/ErrorApi.js";
 import { userValidationSchema} from "../helpers/validation.js";
 import { EventEmitter } from 'events';
 import fs, { unlink } from 'fs/promises';
-import * as path from "path";
-import {createReadStream, appendFileSync} from "fs";
 import csv from "csv-parser";
 import {LOG_FILE, PRODUCTS_FILE} from "../helpers/constants.js";
-import multer from "multer";
-
-
-
+import * as stream from "stream";
 
 const uploadEvents = new EventEmitter();
-
-
 
 async function logEvent(message) {
     const timestamp = new Date().toISOString().replace('T', ' ').split('.')[0];
@@ -131,70 +124,36 @@ export const createNewProduct = async (req, res) => {
 }
 
 export const handleProductImport = async (req, res) =>  {
-    // const filePath = 'storages/products.csv';
-    // const filePath =`storages/${req.file.name}`;
-
-    let file = req.file; //contains the file
-    let filePath = file.path;
+    if (!req.file) {
+        throw new ApiError(400, 'File to upload is absent')
+        return res.status(400).json({ error: 'Нет файла для загрузки' });
+    }
 
     uploadEvents.emit('fileUploadStart');
-
-    try {
-        const products = await parseCSVFile(filePath);
-        await saveProducts(products);
-        // await unlink(filePath);
-
-        uploadEvents.emit('fileUploadEnd');
-        res.status(200).json({ message: 'File successfully uploaded and processed' });
-    } catch (error) {
-        uploadEvents.emit('fileUploadFailed');
-        // await unlink(filePath);
-        throw new ApiError(500, 'Failed to process file')
-    }
-}
-
-
-const ensureProductsFileExists = async() => {
-    try {
-        await fs.access(PRODUCTS_FILE);
-    } catch {
-        await fs.writeFile(PRODUCTS_FILE, JSON.stringify([]));
-    }
-}
-
-const parseCSVFile = async(filePath) =>  {
     const products = [];
-
-    return new Promise((resolve, reject) => {
-        createReadStream(filePath)
-            .pipe(csv())
-            .on('data', (row) => {
-                const product = {
-                    id: crypto.randomUUID(),
-                    name: row.name,
-                    description: row.description,
-                    category: row.category,
-                    price: parseFloat(row.price),
-                };
-                products.push(product);
-            })
-            .on('end', () => resolve(products))
-            .on('error', (error) => reject(error));
-    });
+    const readableStream = new stream.PassThrough();
+    readableStream.end(req.file.buffer);
+    readableStream
+        .pipe(csv())
+        .on('data', (data) => products.push({
+            id: crypto.randomUUID(),
+            name: data.name,
+            description: data.description,
+            category: data.category,
+            price: parseFloat(data.price)
+        }))
+        .on('end', () => {
+            fs.writeFile(PRODUCTS_FILE, JSON.stringify(products, null, 2));
+            uploadEvents.emit('fileUploadEnd');
+            res.status(200).json({ message: 'File successfully uploaded and processed' });
+        })
+        .on('error', (error) => {
+            uploadEvents.emit('fileUploadFailed');
+            throw new ApiError(500, 'Failed to process file')
+        });
 }
 
-const saveProducts = async(newProducts) => {
-    await ensureProductsFileExists();
 
-    try {
-        const data = await fs.readFile(PRODUCTS_FILE, 'utf8');
-        const existingProducts = JSON.parse(data);
-        const updatedProducts = [...existingProducts, ...newProducts];
-        await fs.writeFile(PRODUCTS_FILE, JSON.stringify(updatedProducts, null, 2));
-    } catch (error) {
-        throw new Error('Failed to save products: ' + error.message);
-    }
-}
 
 
 
