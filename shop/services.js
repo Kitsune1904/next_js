@@ -10,11 +10,14 @@ import * as path from "path";
 import {createReadStream, appendFileSync} from "fs";
 import csv from "csv-parser";
 import {LOG_FILE, PRODUCTS_FILE} from "../helpers/constants.js";
+import multer from "multer";
 
 
 
 
 const uploadEvents = new EventEmitter();
+
+
 
 async function logEvent(message) {
     const timestamp = new Date().toISOString().replace('T', ' ').split('.')[0];
@@ -128,20 +131,24 @@ export const createNewProduct = async (req, res) => {
 }
 
 export const handleProductImport = async (req, res) =>  {
-    const filePath = 'storages/products.csv';
+    // const filePath = 'storages/products.csv';
+    // const filePath =`storages/${req.file.name}`;
+
+    let file = req.file; //contains the file
+    let filePath = file.path;
 
     uploadEvents.emit('fileUploadStart');
 
     try {
         const products = await parseCSVFile(filePath);
         await saveProducts(products);
-        await unlink(filePath);
+        // await unlink(filePath);
 
         uploadEvents.emit('fileUploadEnd');
         res.status(200).json({ message: 'File successfully uploaded and processed' });
     } catch (error) {
         uploadEvents.emit('fileUploadFailed');
-        await unlink(filePath);
+        // await unlink(filePath);
         throw new ApiError(500, 'Failed to process file')
     }
 }
@@ -182,10 +189,13 @@ const saveProducts = async(newProducts) => {
     try {
         const data = await fs.readFile(PRODUCTS_FILE, 'utf8');
         const existingProducts = JSON.parse(data);
-
         const updatedProducts = [...existingProducts, ...newProducts];
         await fs.writeFile(PRODUCTS_FILE, JSON.stringify(updatedProducts, null, 2));
     } catch (error) {
         throw new Error('Failed to save products: ' + error.message);
     }
 }
+
+
+
+

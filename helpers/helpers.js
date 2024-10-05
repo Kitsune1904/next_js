@@ -1,6 +1,5 @@
 import {products} from "../storages/storage.js";
 import {ApiError} from "./ErrorApi.js";
-import * as path from "path";
 import fs from 'fs/promises';
 import crypto from "crypto";
 import {PRODUCTS_FILE} from "./constants.js";
