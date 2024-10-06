@@ -6,6 +6,7 @@ import {errorHandler} from "./middleware/errorHandler.js";
 import prodRouter from "./routes/prodRoutes.js";
 
 
+
 const app: Express = express();
 app.use(express.json());
 
