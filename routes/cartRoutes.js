@@ -1,15 +1,11 @@
-import { Router } from 'express';
-import {addProduct, deleteProduct, getOrder} from "../controllers/cart.controllers.js";
-import {checkUserId} from "../middleware/checkId.js";
-
-const cartRouter = Router();
-
-cartRouter.use(checkUserId)
-
-cartRouter.put('/:id', addProduct);
-
-cartRouter.delete('/:id', deleteProduct)
-
-cartRouter.post('/checkout', getOrder)
-
-export default cartRouter
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const cart_controllers_1 = require("../controllers/cart.controllers");
+const checkId_1 = require("../middleware/checkId");
+const cartRouter = (0, express_1.Router)();
+cartRouter.use(checkId_1.checkUserId);
+cartRouter.put('/:id', cart_controllers_1.addProduct);
+cartRouter.delete('/:id', cart_controllers_1.deleteProduct);
+cartRouter.post('/checkout', cart_controllers_1.getOrder);
+exports.default = cartRouter;

@@ -1,5 +1,16 @@
-import {createNewUser} from "../services/user/user.services.js";
-
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.signUp = void 0;
+const user_services_js_1 = require("../services/user/user.services.js");
 /**
  * Receives a request to singUp a new user
  * Response by user info
@@ -7,7 +18,8 @@ import {createNewUser} from "../services/user/user.services.js";
  * @param res
  * @return {Promise<void>}
  */
-export const signUp = async (req,res) => {
-    const newUser = await createNewUser(req.body)
-    res.status(201).json(newUser)
-}
+const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const newUser = yield (0, user_services_js_1.createNewUser)(req.body);
+    res.status(201).json(newUser);
+});
+exports.signUp = signUp;

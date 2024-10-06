@@ -1,62 +1,68 @@
-import {carts, orders} from "../../repository/storage.js";
-import crypto from "crypto";
-import {ApiError} from "../../middleware/ErrorApi.js";
-
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.completeOrder = exports.deleteProductFromCart = exports.createOrCompleteCart = void 0;
+const storage_1 = require("../../repository/storage");
+const crypto_1 = __importDefault(require("crypto"));
+const ErrorApi_1 = require("../../middleware/ErrorApi");
 /**
  * Adds product in new or existed user's cart
  * @param product
  * @param userId
- * @return Cart
+ * @return ICart
  */
-export const createOrCompleteCart = (product, userId) => {
-    let userCart = carts.find(cart => cart.userId === userId);
+const createOrCompleteCart = (product, userId) => {
+    let userCart = storage_1.carts.find((cart) => cart.userId === userId);
     if (!userCart) {
         userCart = {
-            id: crypto.randomUUID(),
+            id: crypto_1.default.randomUUID(),
             userId: userId,
             products: []
-        }
-        carts.push(userCart);
+        };
+        storage_1.carts.push(userCart);
     }
     userCart.products.push(product);
-    return userCart
-}
-
+    return userCart;
+};
+exports.createOrCompleteCart = createOrCompleteCart;
 /**
  * Delete product from user's cart
  * @param prodId
  * @param userId
- * @return Cart
+ * @return ICart
  */
-export const deleteProductFromCart = (prodId, userId) => {
-    let userCart = carts.find(cart => cart.userId === userId);
+const deleteProductFromCart = (prodId, userId) => {
+    let userCart = storage_1.carts.find(cart => cart.userId === userId);
     if (!userCart) {
-        throw new ApiError(404, 'Cart not found')
+        throw new ErrorApi_1.ApiError(404, 'Cart not found');
     }
-    const prodIndex = userCart.products.findIndex(product => product.id === prodId);
+    const prodIndex = userCart.products.findIndex((product) => product.id === prodId);
     if (prodIndex === -1) {
-        throw new ApiError(404, 'Product not found in cart')
+        throw new ErrorApi_1.ApiError(404, 'Product not found in cart');
     }
     userCart.products.splice(prodIndex, 1);
-    return userCart
-}
-
+    return userCart;
+};
+exports.deleteProductFromCart = deleteProductFromCart;
 /**
  * By user ID take its cart and create an order
  * @param userId
- * @return Order
+ * @return IOrder
  */
-export const completeOrder = (userId) => {
-    const userCart = carts.find(cart => cart.userId === userId);
+const completeOrder = (userId) => {
+    const userCart = storage_1.carts.find((cart) => cart.userId === userId);
     if (!userCart) {
-        throw new ApiError(404, 'Cart not found')
+        throw new ErrorApi_1.ApiError(404, 'Cart not found');
     }
     const userOrder = {
-        id: crypto.randomUUID(),
+        id: crypto_1.default.randomUUID(),
         userId: userId,
         products: userCart.products,
         totalPrice: userCart.products.reduce((acc, prod) => acc + prod.price, 0)
-    }
-    orders.push(userOrder);
-    return userOrder
-}
+    };
+    storage_1.orders.push(userOrder);
+    return userOrder;
+};
+exports.completeOrder = completeOrder;

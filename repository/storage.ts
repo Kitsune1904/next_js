@@ -1,7 +1,6 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.orders = exports.carts = exports.users = exports.products = void 0;
-exports.products = [
+import {ICart, IOrder, IUser, TProduct} from "../types_and_interfaces/types_and_interfaces";
+
+export const products: TProduct[] = [
     {
         id: 1,
         title: "Digital Painting",
@@ -63,6 +62,9 @@ exports.products = [
         price: 45
     }
 ];
-exports.users = []; // store the list of users here
-exports.carts = []; // list of carts
-exports.orders = []; // list of crated orders
+
+export const users: IUser[] = []; // store the list of users here
+
+export const carts: ICart[] = []; // list of carts
+
+export const orders: IOrder[] = []; // list of crated orders
