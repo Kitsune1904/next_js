@@ -1,5 +1,5 @@
 import {createNewUser} from "../services/user/user.services.js";
-import {IUser} from "../types_and_interfaces/types_and_interfaces";
+import {IUser} from "../models/models";
 import { Request, Response } from 'express';
 
 /**

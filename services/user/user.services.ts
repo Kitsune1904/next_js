@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import {users} from "../../repository/storage.js";
 import {ApiError} from "../../middleware/ErrorApi.js";
 import Joi, {ObjectSchema} from "joi";
-import {IUser} from "../../types_and_interfaces/types_and_interfaces.js";
+import {IUser} from "../../models/models";
 
 export const userValidationSchema: ObjectSchema = Joi.object({
     email: Joi.string()

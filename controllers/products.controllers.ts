@@ -8,7 +8,7 @@ import fs from "fs/promises";
 import {PRODUCTS_FILE} from "../constants";
 import {addProductInStorage, getProduct} from "../services/products/products.services";
 import { Request, Response } from 'express';
-import {TProductCSV} from "../types_and_interfaces/types_and_interfaces";
+import {TProductCSV} from "../models/models";
 import {PassThrough} from "node:stream";
 
 

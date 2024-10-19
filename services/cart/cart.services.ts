@@ -1,7 +1,7 @@
 import {carts, orders} from "../../repository/storage";
 import crypto from "crypto";
 import {ApiError} from "../../middleware/ErrorApi";
-import {ICart, IOrder, TProduct} from "../../types_and_interfaces/types_and_interfaces";
+import {ICart, IOrder, TProduct} from "../../models/models";
 
 /**
  * Adds product in new or existed user's cart

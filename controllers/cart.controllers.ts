@@ -1,7 +1,7 @@
 import {completeOrder, createOrCompleteCart, deleteProductFromCart} from "../services/cart/cart.services";
 import {getProduct} from "../services/products/products.services";
 import { Request, Response } from 'express';
-import {ICart, IOrder, TProduct} from "../types_and_interfaces/types_and_interfaces";
+import {ICart, IOrder, TProduct} from "../models/models";
 
 /**
  * Receives a request to add a new product in cart

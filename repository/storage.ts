@@ -1,4 +1,4 @@
-import {ICart, IOrder, IUser, TProduct} from "../types_and_interfaces/types_and_interfaces";
+import {ICart, IOrder, IUser, TProduct} from "../models/models";
 
 export const products: TProduct[] = [
     {

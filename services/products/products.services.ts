@@ -3,7 +3,7 @@ import fs from "fs/promises";
 import {PRODUCTS_FILE} from "../../constants";
 import crypto from "crypto";
 import {products} from "../../repository/storage";
-import {TProduct, TProductCSV} from "../../types_and_interfaces/types_and_interfaces";
+import {TProduct, TProductCSV} from "../../models/models";
 import { Request, Response } from 'express';
 
 /**
