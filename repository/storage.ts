@@ -1,4 +1,6 @@
-export const products = [
+import {ICart, IOrder, IUser, TProduct} from "../models/models";
+
+export const products: TProduct[] = [
     {
         id: 1,
         title: "Digital Painting",
@@ -61,8 +63,8 @@ export const products = [
     }
 ];
 
-export const users = []; // store the list of users here
+export const users: IUser[] = []; // store the list of users here
 
-export const carts = []; // list of carts
+export const carts: ICart[] = []; // list of carts
 
-export const orders = []; // list of crated orders
+export const orders: IOrder[] = []; // list of crated orders
