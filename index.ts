@@ -6,10 +6,14 @@ import {errorHandler} from "./middleware/errorHandler.js";
 import prodRouter from "./routes/prodRoutes.js";
 import './services/admin/createAdmin'
 import {auth} from "./middleware/auth";
+import cookieParser from 'cookie-parser';
 
 
 const app: Express = express();
 app.use(express.json());
+
+app.use(cookieParser());
+
 
 app.post('/api/register', signUp);
 
